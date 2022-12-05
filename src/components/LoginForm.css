@@ -1,0 +1,21 @@
+
+
+.login-form-container {
+    display: flex;
+    border: 1px solid white;
+    border-radius: 5%;
+    width: 300px;
+    height: 100%;
+
+    color: aqua;
+
+    
+}
+
+.login-form-body {
+    display: flex;
+
+    margin-top: 15px;
+    margin-left: 15px;
+
+}
