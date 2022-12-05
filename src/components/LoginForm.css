@@ -2,6 +2,7 @@
 
 .login-form-container {
     display: flex;
+    flex-direction: column;
     border: 1px solid white;
     border-radius: 5%;
     width: 300px;
@@ -17,5 +18,15 @@
 
     margin-top: 15px;
     margin-left: 15px;
+    color: turquoise;
 
+}
+
+.login-field {
+    display: flex;
+    margin-top: 15px;
+    color: turquoise;
+
+    margin-left: 10px;
+    margin-right: 10px;
 }
