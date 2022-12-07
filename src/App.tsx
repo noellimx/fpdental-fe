@@ -1,12 +1,15 @@
 import "./App.css";
 import { createBrowserRouter, RouterProvider, Route } from "react-router-dom";
-import LoginForm from "./components/LoginForm";
+import IdentityPane from "./components/IdentityPane";
 import useAuthService from "./contexts/Auth";
 import { GlobalContextAuth } from "./contexts/Auth";
+import useGeneralUserAppointmentService, {
+  GlobalContextUserAppointment as GlobalContextUserGeneralAppointment,
+} from "./contexts/UserAppointments";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <LoginForm />,
+    element: <IdentityPane />,
     errorElement: <div />,
   },
   {
@@ -19,7 +22,11 @@ function App() {
   return (
     <div className="app">
       <GlobalContextAuth.Provider value={useAuthService()}>
-        <RouterProvider router={router} />
+        <GlobalContextUserGeneralAppointment.Provider
+          value={useGeneralUserAppointmentService()}
+        >
+          <RouterProvider router={router} />
+        </GlobalContextUserGeneralAppointment.Provider>
       </GlobalContextAuth.Provider>
     </div>
   );

@@ -2,9 +2,16 @@ import { useCallback, useEffect, useReducer } from "react";
 import { createContext } from "react";
 import store from "store";
 
+enum Role {
+  ADMIN = "admin",
+  GENERAL = "general",
+  UNKNOWN = "unknown",
+}
+
 interface Token {
   id: string;
   username: string;
+  role: Role;
   expiry?: string;
 }
 
@@ -51,10 +58,12 @@ interface CredentialsAction {
 const TOKEN_KEY = "my-token";
 const dummyAPIBrowser = (() => {
   return {
-    getSessionToken: () => {
+    getSessionToken: (): Token => {
       return store.get(TOKEN_KEY);
     },
-
+    setSessionToken: (t: Token) => {
+      store.set(TOKEN_KEY, t);
+    },
     clearSessionToken: () => {
       store.remove(TOKEN_KEY);
     },
@@ -62,43 +71,33 @@ const dummyAPIBrowser = (() => {
 })();
 
 const dummyAPIServer = (() => {
-  const validateTokenWithServer = (token: string) => {
-    if (token === "12345") {
-      return {
-        is: true,
-        role: "admin",
-        username: "dummyadmin",
-      };
-    }
-    if (token === "abcde") {
-      return {
-        is: true,
-        role: "user",
-        username: "dummyuser",
-      };
-    } else {
-      return {
-        is: false,
-      };
-    }
+  const _validateTokenWithServer = (token: Token) => {
+    return true;
   };
   return {
     isValidToken: async () => {
       const token = dummyAPIBrowser.getSessionToken();
-      return validateTokenWithServer(token);
+      const is = _validateTokenWithServer(token);
+      return is ? { is, token } : { is, token: null };
     },
     login: async (
       un: string,
       pw: string
-    ): Promise<{ statusCode: number; token?: string }> => {
+    ): Promise<{ statusCode: number; token?: Token }> => {
       return new Promise((resolve) =>
         setTimeout(() => {
           console.log(`[dummyAPI-login] ${un} `);
           if (un === pw) {
+            let role = Role.UNKNOWN;
+            if (un === "dummyadmin") {
+              role = Role.ADMIN;
+            } else {
+              role = Role.GENERAL;
+            }
+
             resolve({
               statusCode: HttpStatusCodes.OK,
-
-              token: "12345",
+              token: { id: `${un}12345`, username: un, role },
             });
           } else {
             resolve({ statusCode: 403 });
@@ -115,6 +114,7 @@ enum CredentialsCommand {
   SET_STATUS_UNVERIFIED = "SET_STATUS_UNVERIFIED",
   SET_STATUS_VERIFYING = "SET_STATUS_VERIFYING",
   SET_STATUS_USER_ADMIN = "SET_STATUS_USER_ADMIN",
+  SET_STATUS_USER_GENERAL = "SET_STATUS_USER_GENERAL",
   SET_USERNAME = "SET_USERNAME",
   LOGOUT = "LOGOUT",
 }
@@ -160,6 +160,10 @@ const useAuthService = () => {
           const newState3 = { ...state };
           newState3.status = CredentialStatus.USER_ADMIN;
           return newState3;
+        case CredentialsCommand.SET_STATUS_USER_GENERAL:
+          const newState6 = { ...state };
+          newState6.status = CredentialStatus.USER_GENERAL;
+          return newState6;
 
         case CredentialsCommand.SET_USERNAME:
           const newState4 = { ...state };
@@ -168,7 +172,6 @@ const useAuthService = () => {
 
         case CredentialsCommand.LOGOUT:
           const newState5 = { ...state };
-          newState5.mode.password.password = "";
           newState5.status = CredentialStatus.UNVERIFIED;
           return newState5;
       }
@@ -191,6 +194,21 @@ const useAuthService = () => {
       args: newCredentialStateNull(),
     });
   };
+
+  const setStatusUserGeneral = () => {
+    dispatchCredentials({
+      command: CredentialsCommand.SET_STATUS_USER_GENERAL,
+      args: newCredentialStateNull(),
+    });
+  };
+
+  const setStatusVerifying = () => {
+    dispatchCredentials({
+      command: CredentialsCommand.SET_STATUS_VERIFYING,
+      args: newCredentialStateNull(),
+    });
+  };
+
   const setUsername = (username: string) => {
     const credentials = newCredentialStateNull();
 
@@ -207,10 +225,7 @@ const useAuthService = () => {
       console.log("[AuthService] Checking Authentication Status...");
       const token = dummyAPIBrowser.getSessionToken();
 
-      dispatchCredentials({
-        command: CredentialsCommand.SET_STATUS_VERIFYING,
-        args: newCredentialStateNull(),
-      });
+      setStatusVerifying();
 
       if (token === undefined) {
         console.log(
@@ -224,16 +239,23 @@ const useAuthService = () => {
 
         const response = await dummyAPIServer.isValidToken();
 
-        const { is } = response;
+        const { is, token } = response;
 
+        if (token !== null) {
+          dummyAPIBrowser.setSessionToken(token);
+        } else {
+          dummyAPIBrowser.clearSessionToken();
+        }
         if (is) {
           console.log(`[AuthService] Authentication Status... good.`);
 
-          const { username, role } = response;
+          const { username, role } = token;
 
           setUsername(username as string);
-          if (role === "admin") {
+          if (role === Role.ADMIN) {
             setStatusUserAdmin();
+          } else if (role == Role.GENERAL) {
+            setStatusUserGeneral();
           }
         } else {
           console.log(
@@ -271,7 +293,8 @@ const useAuthService = () => {
     updateFieldPassword("");
   }, []);
 
-  const submit = useCallback(async () => {
+  const login = useCallback(async () => {
+    setStatusVerifying();
     const { username, password } = credentials.mode.password;
 
     console.log(`[submitting credentials] un -> ${username} `);
@@ -282,12 +305,20 @@ const useAuthService = () => {
     const response = await responsePromise;
     const { statusCode } = response;
 
-    console.log(`response ${JSON.stringify(response)}`);
+    if (statusCode === HttpStatusCodes.OK && response.token !== undefined) {
+      dummyAPIBrowser.setSessionToken(response.token);
 
-    if (statusCode === HttpStatusCodes.OK) {
-      const { token } = response;
+      if (response.token.role == Role.ADMIN) {
+        setStatusUserAdmin();
+      } else {
+        response.token.role == Role.GENERAL;
+        setStatusUserGeneral();
+      }
+    } else {
+      dummyAPIBrowser.clearSessionToken();
+      setStatusUnverified();
     }
-
+    console.log(`stat 1 :${statusCode}`);
     return statusCode;
   }, [credentials.mode.password.username, credentials.mode.password.password]);
 
@@ -297,6 +328,8 @@ const useAuthService = () => {
       command: CredentialsCommand.LOGOUT,
       args: newCredentialStateNull(),
     });
+
+    resetPassword();
   };
   return {
     fields: {
@@ -305,7 +338,7 @@ const useAuthService = () => {
     },
     updateFieldPassword,
     updateFieldUsername,
-    submit,
+    login,
     logout,
     status: credentials.status,
   };

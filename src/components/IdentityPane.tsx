@@ -73,14 +73,17 @@ const _buttonSubmit = ({
 }: {
   setStatusCode: Dispatch<SetStateAction<number>>;
 }) => {
-  const { submit } = useContext(GlobalContextAuth);
+  const { login } = useContext(GlobalContextAuth);
 
   return (
     <>
       <button
         onClick={async () => {
-          const statusCode = await submit();
-          setStatusCode(statusCode);
+          const statusCode = await login();
+
+          console.log(`stat 2 :${statusCode}`);
+
+          setStatusCode(() => statusCode);
         }}
       >
         Login
@@ -89,19 +92,20 @@ const _buttonSubmit = ({
   );
 };
 
-const LoginFormEditable = () => {
-  const [statusCode, setStatusCode] = useState(-1);
-
-  {
-    statusCode === 403 && <div>403</div>;
-  }
-
+const LoginFormEditable = ({
+  setStatusCode,
+  statusCode,
+}: {
+  setStatusCode: Dispatch<SetStateAction<number>>;
+  statusCode: number;
+}) => {
   return (
     <>
       {" "}
       <_inputUsername />
       <_inputPassword />
       <_buttonSubmit setStatusCode={setStatusCode} />
+      {<div>{statusCode}</div>}
     </>
   );
 };
@@ -133,6 +137,7 @@ const LoginFormVerifying = () => {
 
 export default () => {
   const { status } = useContext(GlobalContextAuth);
+  const [statusCode, setStatusCode] = useState(-1);
 
   let body = <div> unimplemented </div>;
 
@@ -148,12 +153,19 @@ export default () => {
       body = <LoginFormVerifying />;
       break;
 
-    case CredentialStatus.USER_ADMIN || CredentialStatus.USER_GENERAL:
+    case CredentialStatus.USER_ADMIN:
+    case CredentialStatus.USER_GENERAL:
       body = <LoginFormReadonly />;
+
       break;
 
     case CredentialStatus.UNVERIFIED:
-      body = <LoginFormEditable />;
+      body = (
+        <LoginFormEditable
+          statusCode={statusCode}
+          setStatusCode={setStatusCode}
+        />
+      );
       break;
   }
   return (
