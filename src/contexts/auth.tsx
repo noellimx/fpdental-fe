@@ -2,6 +2,12 @@ import { useCallback, useEffect, useReducer } from "react";
 import { createContext } from "react";
 import store from "store";
 
+interface Token {
+  id: string;
+  username: string;
+  expiry?: string;
+}
+
 enum HttpStatusCodes {
   OK = 200,
 }
@@ -56,28 +62,30 @@ const dummyAPIBrowser = (() => {
 })();
 
 const dummyAPIServer = (() => {
+  const validateTokenWithServer = (token: string) => {
+    if (token === "12345") {
+      return {
+        is: true,
+        role: "admin",
+        username: "dummyadmin",
+      };
+    }
+    if (token === "abcde") {
+      return {
+        is: true,
+        role: "user",
+        username: "dummyuser",
+      };
+    } else {
+      return {
+        is: false,
+      };
+    }
+  };
   return {
     isValidToken: async () => {
       const token = dummyAPIBrowser.getSessionToken();
-
-      if (token === "12345") {
-        return {
-          is: true,
-          role: "admin",
-          username: "dummyadmin",
-        };
-      }
-      if (token === "abcde") {
-        return {
-          is: true,
-          role: "user",
-          username: "dummyuser",
-        };
-      } else {
-        return {
-          is: false,
-        };
-      }
+      return validateTokenWithServer(token);
     },
     login: async (
       un: string,
