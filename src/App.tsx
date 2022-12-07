@@ -1,8 +1,8 @@
 import "./App.css";
 import { createBrowserRouter, RouterProvider, Route } from "react-router-dom";
 import LoginForm from "./components/LoginForm";
-import useAuthService from "./contexts/auth";
-import { GlobalContextAuth } from "./contexts/auth";
+import useAuthService from "./contexts/Auth";
+import { GlobalContextAuth } from "./contexts/Auth";
 const router = createBrowserRouter([
   {
     path: "/",
