@@ -79,8 +79,6 @@ const _buttonSubmit = ({
         onClick={async () => {
           const statusCode = await login();
 
-          console.log(`stat 2 :${statusCode}`);
-
           setStatusCode(() => statusCode);
         }}
       >

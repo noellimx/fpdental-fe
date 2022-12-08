@@ -261,7 +261,6 @@ const useAuthService = () => {
       dummyAPIBrowser.clearSessionToken();
       setStatusUnverified();
     }
-    console.log(`stat 1 :${statusCode}`);
     return statusCode;
   }, [credentials.mode.password.username, credentials.mode.password.password]);
 
