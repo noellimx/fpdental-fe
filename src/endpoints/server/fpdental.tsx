@@ -5,17 +5,34 @@ import {
   TokenBE,
   transformTokenBeToToken,
 } from "../browser";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
-const PORT = ":8000";
-const instance = axios.create({
-  baseURL: `http://localhost${PORT}`,
-  timeout: 2000,
-});
+type AppointmentBE = {
+  Description: string;
+  Id: UuidString;
+};
+
+const transformAppointmentBEToAppointment = (
+  apptB: AppointmentBE
+): Appointment => {
+  const { Description, Id } = apptB;
+  return {
+    description: Description,
+    id: Id,
+  };
+};
+const transformAppointmentBEToAppointmentMany = (apptBs: AppointmentBE[]) => {
+  return apptBs.map(transformAppointmentBEToAppointment);
+};
 
 export const APIServerFpDental = (() => {
+  const PORT = ":8000";
+  const instance = axios.create({
+    baseURL: `http://localhost${PORT}`,
+    timeout: 2000,
+  });
+
   const _validateTokenWithServer = async (token: Token) => {
-    // TODO
     console.log(
       `[APIServerFpDental::_validateTokenWithServer]${JSON.stringify(token)}`
     );
@@ -23,8 +40,10 @@ export const APIServerFpDental = (() => {
     return new Promise((resolve) => {
       setTimeout(async () => {
         try {
-          const resp = await instance.post("/auth/is-valid-token", { token });
-          const { Is: is } = resp.data;
+          const response = await instance.post("/auth/is-valid-token", {
+            token,
+          });
+          const { Is: is } = response.data;
           console.log(`[APIServerFpDental::_validateTokenWithServer] ?${is}`);
 
           resolve(is);
@@ -37,8 +56,14 @@ export const APIServerFpDental = (() => {
 
   const _getMyAppointments = async (token: Token): Promise<Appointment[]> => {
     // TODO
-    const appointments: Appointment[] = [];
-    return appointments;
+
+    const response = await instance.post("/appointments", { token });
+
+    const { Appointments: appointments }: { Appointments: AppointmentBE[] } =
+      response.data;
+
+    console.log(`[_getMyAppointments] ${JSON.stringify(appointments)}`);
+    return transformAppointmentBEToAppointmentMany(appointments);
   };
 
   const _removeAppointment = async (
@@ -98,7 +123,11 @@ export const APIServerFpDental = (() => {
             );
 
             resolve(resolution);
-          } catch {}
+          } catch (error) {
+            if (axios.isAxiosError(error)) {
+              resolve({ statusCode: Number(error.response?.status) });
+            }
+          }
 
           resolve({ statusCode: -1 });
         }, 1000)
