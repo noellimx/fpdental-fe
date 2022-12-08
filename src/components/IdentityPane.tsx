@@ -158,7 +158,9 @@ export default () => {
       body = <LoginFormReadonly />;
 
       break;
-
+    case CredentialStatus.UNKNOWN:
+      body = <div>User has unknown role.</div>;
+      break;
     case CredentialStatus.UNVERIFIED:
       body = (
         <LoginFormEditable

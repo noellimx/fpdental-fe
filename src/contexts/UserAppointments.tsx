@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { dummyAPIServer } from "../endpoints/server/dummy";
+import { APIServerMock } from "../endpoints/server/mock";
 import useAuthService, { CredentialStatus } from "./Auth";
 
 export type UuidString = string;
@@ -7,6 +7,7 @@ export type Appointment = {
   description: string;
   id: UuidString;
 };
+
 const useGeneralUserAppointmentService = (
   ctxAuth: ReturnType<typeof useAuthService>
 ) => {
@@ -22,7 +23,7 @@ const useGeneralUserAppointmentService = (
     (async () => {
       console.log(`status now is ${ctxAuth.status}`);
       if (ctxAuth.status === CredentialStatus.USER_GENERAL) {
-        const appointments = await dummyAPIServer.getMyAppointments();
+        const appointments = await APIServerMock.getMyAppointments();
         setAppointmentsBooked(() => appointments);
       }
     })();

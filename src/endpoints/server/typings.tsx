@@ -1,3 +1,3 @@
-import { dummyAPIServer } from "./dummy";
+import { APIServerMock } from "./mock";
 
-export type APIServer = typeof dummyAPIServer;
+export type APIServer = typeof APIServerMock;

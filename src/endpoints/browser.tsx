@@ -10,6 +10,22 @@ export interface Token {
   expiry?: string;
 }
 
+export interface TokenBE {
+  Id: string;
+  Username: string;
+  Role: Role;
+  Expiry?: string;
+}
+
+export const transformTokenBeToToken = (source: TokenBE) => {
+  return {
+    id: source.Id,
+    username: source.Username,
+    role: source.Role,
+    expiry: source.Expiry,
+  };
+};
+
 export const dummyAPIBrowser = (() => {
   return {
     getSessionToken: (): Token => {

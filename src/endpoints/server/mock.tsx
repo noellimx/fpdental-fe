@@ -49,7 +49,7 @@ const DummyAppointments: InterfaceGetDummyAppointments = {
   user1: genDb([t1]),
   user2: genDb([t2]),
 };
-export const dummyAPIServer = (() => {
+export const APIServerMock = (() => {
   const _validateTokenWithServer = async (token: Token) => {
     return token && true;
   };

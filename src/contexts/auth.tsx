@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useReducer } from "react";
 import { createContext } from "react";
 
-import { dummyAPIBrowser, Token } from "../endpoints/browser";
+import { dummyAPIBrowser } from "../endpoints/browser";
 
-import { dummyAPIServer } from "../endpoints/server/dummy";
-
+import { authServerAPI } from "../drivers/server";
 export enum Role {
-  ADMIN = "admin",
-  GENERAL = "general",
-  UNKNOWN = "unknown",
+  ADMIN = "Admin",
+  GENERAL = "General",
+  UNKNOWN = "Unknown",
 }
 
 export enum HttpStatusCodes {
@@ -58,6 +57,7 @@ enum CredentialsCommand {
   SET_STATUS_VERIFYING = "SET_STATUS_VERIFYING",
   SET_STATUS_USER_ADMIN = "SET_STATUS_USER_ADMIN",
   SET_STATUS_USER_GENERAL = "SET_STATUS_USER_GENERAL",
+  SET_STATUS_UNKNOWN = "SET_STATUS_UNKNOWN",
   SET_USERNAME = "SET_USERNAME",
   LOGOUT = "LOGOUT",
 }
@@ -108,6 +108,11 @@ const useAuthService = () => {
           newState6.status = CredentialStatus.USER_GENERAL;
           return newState6;
 
+        case CredentialsCommand.SET_STATUS_UNKNOWN:
+          const newState7 = { ...state };
+          newState7.status = CredentialStatus.UNKNOWN;
+          return newState7;
+
         case CredentialsCommand.SET_USERNAME:
           const newState4 = { ...state };
           newState4.mode.password.username = action.args.mode.password.username;
@@ -141,6 +146,13 @@ const useAuthService = () => {
   const setStatusUserGeneral = () => {
     dispatchCredentials({
       command: CredentialsCommand.SET_STATUS_USER_GENERAL,
+      args: newCredentialStateNull(),
+    });
+  };
+
+  const setStatusUnknown = () => {
+    dispatchCredentials({
+      command: CredentialsCommand.SET_STATUS_UNKNOWN,
       args: newCredentialStateNull(),
     });
   };
@@ -180,7 +192,7 @@ const useAuthService = () => {
           `[AuthService] Checking Authentication Status... checking token obtained from local storage against server`
         );
 
-        const response = await dummyAPIServer.isValidToken();
+        const response = await authServerAPI.isValidToken();
 
         const { is, token: _token } = response;
 
@@ -199,6 +211,8 @@ const useAuthService = () => {
             setStatusUserAdmin();
           } else if (role == Role.GENERAL) {
             setStatusUserGeneral();
+          } else {
+            setStatusUnknown();
           }
         } else {
           console.log(
@@ -242,22 +256,33 @@ const useAuthService = () => {
 
     console.log(`[submitting credentials] un -> ${username} `);
 
-    const responsePromise = dummyAPIServer.login(username, password);
+    const responsePromise = authServerAPI.login(username, password);
     resetPassword();
 
     const response = await responsePromise;
-    const { statusCode } = response;
 
-    if (statusCode === HttpStatusCodes.OK && response.token !== undefined) {
-      dummyAPIBrowser.setSessionToken(response.token);
+    console.log(
+      `[login] un -> ${username} Status ok. response ${JSON.stringify(
+        response
+      )}`
+    );
+    const { statusCode, token } = response;
 
-      if (response.token.role == Role.ADMIN) {
+    if (statusCode === HttpStatusCodes.OK && token !== undefined) {
+      console.log(
+        `[login] un -> ${username} Status ok. setting token ${token}`
+      );
+
+      dummyAPIBrowser.setSessionToken(token);
+
+      if (token.role == Role.ADMIN) {
         setStatusUserAdmin();
       } else {
-        response.token.role == Role.GENERAL;
+        token.role == Role.GENERAL;
         setStatusUserGeneral();
       }
     } else {
+      `[login] un -> ${username} Status bad: ${statusCode}.`;
       dummyAPIBrowser.clearSessionToken();
       setStatusUnverified();
     }

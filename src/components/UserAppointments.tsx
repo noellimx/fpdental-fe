@@ -5,7 +5,7 @@ import {
   GlobalContextUserAppointment,
 } from "../contexts/UserAppointments";
 
-import { dummyAPIServer } from "../endpoints/server/dummy";
+import { authServerAPI } from "../drivers/server";
 import "./UserAppointments.css";
 
 enum DisplayMode {
@@ -28,7 +28,7 @@ const BookedAppointment = ({ appointment }: { appointment: Appointment }) => {
               onClick={async () => {
                 console.log(`[BookedAppointment] clicked`);
                 setDisplayMode(DisplayMode.SUSPENSE);
-                const ok = await dummyAPIServer.removeMyAppointment(id);
+                const ok = await authServerAPI.removeMyAppointment(id);
 
                 if (ok) {
                   setDisplayMode(DisplayMode.HIDDEN);

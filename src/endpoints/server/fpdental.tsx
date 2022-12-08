@@ -1,9 +1,19 @@
-//
-
-import { HttpStatusCodes, Role } from "../../contexts/Auth";
 import { Appointment, UuidString } from "../../contexts/UserAppointments";
-import { dummyAPIBrowser, Token } from "../browser";
-export const dummyAPIServer = (() => {
+import {
+  dummyAPIBrowser,
+  Token,
+  TokenBE,
+  transformTokenBeToToken,
+} from "../browser";
+import axios from "axios";
+
+const PORT = ":8000";
+const instance = axios.create({
+  baseURL: `http://localhost${PORT}`,
+  timeout: 2000,
+});
+
+export const APIServerFpDental = (() => {
   const _validateTokenWithServer = async (token: Token) => {
     // TODO
     return token && true;
@@ -49,25 +59,32 @@ export const dummyAPIServer = (() => {
       un: string,
       pw: string
     ): Promise<{ statusCode: number; token?: Token }> => {
-      // TODO
       return new Promise((resolve) =>
-        setTimeout(() => {
+        setTimeout(async () => {
           console.log(`[API-login] ${un} `);
-          if (un === pw) {
-            let role = Role.UNKNOWN;
-            if (un === "dummyadmin") {
-              role = Role.ADMIN;
-            } else {
-              role = Role.GENERAL;
-            }
 
-            resolve({
-              statusCode: HttpStatusCodes.OK,
-              token: { id: `${un}12345`, username: un, role },
+          try {
+            const response = await instance.post("/auth/login", {
+              username: un,
+              password: pw,
             });
-          } else {
-            resolve({ statusCode: 403 });
-          }
+
+            const data = response.data;
+
+            const _token: TokenBE = data.Token;
+            const resolution = {
+              statusCode: response.status,
+              token: transformTokenBeToToken(_token),
+            };
+
+            console.log(
+              `[API-login] Resolution: ${JSON.stringify(resolution)} `
+            );
+
+            resolve(resolution);
+          } catch {}
+
+          resolve({ statusCode: -1 });
         }, 1000)
       );
     },
