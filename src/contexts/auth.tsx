@@ -1,18 +1,12 @@
 import { useCallback, useEffect, useReducer } from "react";
 import { createContext } from "react";
-import store from "store";
 
-enum Role {
+import { dummyAPIBrowser, Token } from "../endpoints/browser";
+
+export enum Role {
   ADMIN = "admin",
   GENERAL = "general",
   UNKNOWN = "unknown",
-}
-
-interface Token {
-  id: string;
-  username: string;
-  role: Role;
-  expiry?: string;
 }
 
 enum HttpStatusCodes {
@@ -54,21 +48,6 @@ interface CredentialsAction {
   command: string;
   args: CredentialsState;
 }
-
-const TOKEN_KEY = "my-token";
-const dummyAPIBrowser = (() => {
-  return {
-    getSessionToken: (): Token => {
-      return store.get(TOKEN_KEY);
-    },
-    setSessionToken: (t: Token) => {
-      store.set(TOKEN_KEY, t);
-    },
-    clearSessionToken: () => {
-      store.remove(TOKEN_KEY);
-    },
-  };
-})();
 
 const dummyAPIServer = (() => {
   const _validateTokenWithServer = (token: Token) => {

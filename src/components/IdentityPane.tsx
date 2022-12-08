@@ -139,7 +139,7 @@ export default () => {
   const { status } = useContext(GlobalContextAuth);
   const [statusCode, setStatusCode] = useState(-1);
 
-  let body = <div> unimplemented </div>;
+  let body = <div> {status} unimplemented </div>;
 
   switch (status) {
     case CredentialStatus.NULL:

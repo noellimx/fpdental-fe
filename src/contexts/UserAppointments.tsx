@@ -4,8 +4,6 @@ import useAuthService from "./Auth";
 const useGeneralUserAppointmentService = (
   ctxAuth: ReturnType<typeof useAuthService>
 ) => {
-  // const ctx = useContext(GlobalContextAuth);
-
   console.log(`${JSON.stringify(ctxAuth)}`);
 
   console.log(
