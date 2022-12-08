@@ -193,7 +193,11 @@ const useAuthService = () => {
         );
 
         const response = await authServerAPI.isValidToken();
-
+        console.log(
+          `[AuthService] Checking Authentication Status... ${JSON.stringify(
+            response
+          )}`
+        );
         const { is, token: _token } = response;
 
         if (_token) {
@@ -204,7 +208,7 @@ const useAuthService = () => {
         if (is) {
           console.log(`[AuthService] Authentication Status... good.`);
 
-          const { username, role } = _token;
+          const { username, role } = _token!;
 
           setUsername(username as string);
           if (role === Role.ADMIN) {
@@ -270,7 +274,9 @@ const useAuthService = () => {
 
     if (statusCode === HttpStatusCodes.OK && token !== undefined) {
       console.log(
-        `[login] un -> ${username} Status ok. setting token ${token}`
+        `[login] un -> ${username} Status ok. setting token ${JSON.stringify(
+          token
+        )}`
       );
 
       dummyAPIBrowser.setSessionToken(token);

@@ -1,5 +1,6 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { APIServerMock } from "../endpoints/server/mock";
+import { createContext, useEffect, useState } from "react";
+
+import { APIServerFpDental } from "../endpoints/server/fpdental";
 import useAuthService, { CredentialStatus } from "./Auth";
 
 export type UuidString = string;
@@ -21,9 +22,11 @@ const useGeneralUserAppointmentService = (
       )}`
     );
     (async () => {
-      console.log(`status now is ${ctxAuth.status}`);
+      console.log(
+        `[useGeneralUserAppointmentService] status now is ${ctxAuth.status}`
+      );
       if (ctxAuth.status === CredentialStatus.USER_GENERAL) {
-        const appointments = await APIServerMock.getMyAppointments();
+        const appointments = await APIServerFpDental.getMyAppointments();
         setAppointmentsBooked(() => appointments);
       }
     })();

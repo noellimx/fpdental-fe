@@ -16,7 +16,23 @@ const instance = axios.create({
 export const APIServerFpDental = (() => {
   const _validateTokenWithServer = async (token: Token) => {
     // TODO
-    return token && true;
+    console.log(
+      `[APIServerFpDental::_validateTokenWithServer]${JSON.stringify(token)}`
+    );
+
+    return new Promise((resolve) => {
+      setTimeout(async () => {
+        try {
+          const resp = await instance.post("/auth/is-valid-token", { token });
+          const { Is: is } = resp.data;
+          console.log(`[APIServerFpDental::_validateTokenWithServer] ?${is}`);
+
+          resolve(is);
+        } catch {
+          resolve(false);
+        }
+      }, 500);
+    });
   };
 
   const _getMyAppointments = async (token: Token): Promise<Appointment[]> => {

@@ -32,6 +32,7 @@ export const dummyAPIBrowser = (() => {
       return store.get(TOKEN_KEY);
     },
     setSessionToken: (t: Token) => {
+      console.log(`[setSessionToken]`);
       store.set(TOKEN_KEY, t);
     },
     clearSessionToken: () => {
