@@ -1,6 +1,7 @@
 import { HttpStatusCodes, Role } from "../../contexts/Auth";
 import { Appointment, UuidString } from "../../contexts/UserAppointments";
-import { dummyAPIBrowser, Token } from "../browser";
+import { Token } from "../browser";
+import { APIBrowser } from "../../drivers/browser";
 interface InterfaceGetDummyAppointments {
   [key: string]: {
     get: () => Appointment[];
@@ -76,18 +77,18 @@ export const APIServerMock = (() => {
   };
   return {
     isValidToken: async () => {
-      const token = dummyAPIBrowser.getSessionToken();
+      const token = APIBrowser.getSessionToken();
       const is = await _validateTokenWithServer(token);
       return is ? { is, token } : { is, token: null };
     },
     getMyAppointments: async (): Promise<Appointment[]> => {
-      const token = dummyAPIBrowser.getSessionToken();
+      const token = APIBrowser.getSessionToken();
       const appointments = await _getMyAppointments(token);
       return appointments;
     },
 
     removeMyAppointment: async (apptId: UuidString) => {
-      const token = dummyAPIBrowser.getSessionToken();
+      const token = APIBrowser.getSessionToken();
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve(_removeAppointment(apptId, token));

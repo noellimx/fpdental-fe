@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useReducer } from "react";
 import { createContext } from "react";
 
-import { dummyAPIBrowser } from "../endpoints/browser";
+import { APIBrowser } from "../drivers/browser";
 
-import { authServerAPI } from "../drivers/server";
+import { APIServerAuth } from "../drivers/server";
 export enum Role {
   ADMIN = "Admin",
   GENERAL = "General",
@@ -178,7 +178,7 @@ const useAuthService = () => {
   useEffect(() => {
     (async () => {
       console.log("[AuthService] Checking Authentication Status...");
-      const token = dummyAPIBrowser.getSessionToken();
+      const token = APIBrowser.getSessionToken();
 
       setStatusVerifying();
 
@@ -192,7 +192,7 @@ const useAuthService = () => {
           `[AuthService] Checking Authentication Status... checking token obtained from local storage against server`
         );
 
-        const response = await authServerAPI.isValidToken();
+        const response = await APIServerAuth.isValidToken();
         console.log(
           `[AuthService] Checking Authentication Status... ${JSON.stringify(
             response
@@ -201,9 +201,9 @@ const useAuthService = () => {
         const { is, token: _token } = response;
 
         if (_token) {
-          dummyAPIBrowser.setSessionToken(_token);
+          APIBrowser.setSessionToken(_token);
         } else {
-          dummyAPIBrowser.clearSessionToken();
+          APIBrowser.clearSessionToken();
         }
         if (is) {
           console.log(`[AuthService] Authentication Status... good.`);
@@ -224,7 +224,7 @@ const useAuthService = () => {
           );
 
           setStatusUnverified();
-          dummyAPIBrowser.clearSessionToken();
+          APIBrowser.clearSessionToken();
         }
       }
     })();
@@ -260,7 +260,7 @@ const useAuthService = () => {
 
     console.log(`[submitting credentials] un -> ${username} `);
 
-    const responsePromise = authServerAPI.login(username, password);
+    const responsePromise = APIServerAuth.login(username, password);
     resetPassword();
 
     const response = await responsePromise;
@@ -279,7 +279,7 @@ const useAuthService = () => {
         )}`
       );
 
-      dummyAPIBrowser.setSessionToken(token);
+      APIBrowser.setSessionToken(token);
 
       if (token.role == Role.ADMIN) {
         setStatusUserAdmin();
@@ -289,14 +289,14 @@ const useAuthService = () => {
       }
     } else {
       `[login] un -> ${username} Status bad: ${statusCode}.`;
-      dummyAPIBrowser.clearSessionToken();
+      APIBrowser.clearSessionToken();
       setStatusUnverified();
     }
     return statusCode;
   }, [credentials.mode.password.username, credentials.mode.password.password]);
 
   const logout = () => {
-    dummyAPIBrowser.clearSessionToken();
+    APIBrowser.clearSessionToken();
     dispatchCredentials({
       command: CredentialsCommand.LOGOUT,
       args: newCredentialStateNull(),

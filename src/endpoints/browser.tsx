@@ -26,7 +26,7 @@ export const transformTokenBeToToken = (source: TokenBE) => {
   };
 };
 
-export const dummyAPIBrowser = (() => {
+export const APIBrowser = (() => {
   return {
     getSessionToken: (): Token => {
       return store.get(TOKEN_KEY);

@@ -1,6 +1,6 @@
 import { Appointment, UuidString } from "../../contexts/UserAppointments";
 import {
-  dummyAPIBrowser,
+  APIBrowser,
   Token,
   TokenBE,
   transformTokenBeToToken,
@@ -52,18 +52,18 @@ export const APIServerFpDental = (() => {
   };
   return {
     isValidToken: async () => {
-      const token = dummyAPIBrowser.getSessionToken();
+      const token = APIBrowser.getSessionToken();
       const is = await _validateTokenWithServer(token);
       return is ? { is, token } : { is, token: null };
     },
     getMyAppointments: async (): Promise<Appointment[]> => {
-      const token = dummyAPIBrowser.getSessionToken();
+      const token = APIBrowser.getSessionToken();
       const appointments = await _getMyAppointments(token);
       return appointments;
     },
 
     removeMyAppointment: async (apptId: UuidString) => {
-      const token = dummyAPIBrowser.getSessionToken();
+      const token = APIBrowser.getSessionToken();
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve(_removeAppointment(apptId, token));
