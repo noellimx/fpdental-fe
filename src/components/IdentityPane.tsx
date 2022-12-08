@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useContext, useState } from "react";
 import { GlobalContextAuth } from "../contexts/Auth";
-import "./LoginForm.css";
+import "./IdentityPane.css";
 
 import { CredentialStatus } from "../contexts/Auth";
 
@@ -105,7 +105,7 @@ const LoginFormEditable = ({
       <_inputUsername />
       <_inputPassword />
       <_buttonSubmit setStatusCode={setStatusCode} />
-      {<div>{statusCode}</div>}
+      {statusCode > 0 && <div>{statusCode}</div>}
     </>
   );
 };

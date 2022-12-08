@@ -1,16 +1,24 @@
 import "./App.css";
-import { createBrowserRouter, RouterProvider, Route } from "react-router-dom";
-import IdentityPane from "./components/IdentityPane";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
 import useAuthService from "./contexts/Auth";
 import { GlobalContextAuth } from "./contexts/Auth";
 import useGeneralUserAppointmentService, {
   GlobalContextUserAppointment as GlobalContextUserGeneralAppointment,
 } from "./contexts/UserAppointments";
+import GeneralUserAppointments from "./components/UserAppointments";
+import Template from "./components/Template";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <IdentityPane />,
+    element: <Template />,
     errorElement: <div />,
+    children: [
+      {
+        path: "/general-user",
+        element: <GeneralUserAppointments />,
+      },
+    ],
   },
   {
     path: "contacts/:contactId",
@@ -19,11 +27,12 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  const authCtx = useAuthService();
   return (
     <div className="app">
-      <GlobalContextAuth.Provider value={useAuthService()}>
+      <GlobalContextAuth.Provider value={authCtx}>
         <GlobalContextUserGeneralAppointment.Provider
-          value={useGeneralUserAppointmentService()}
+          value={useGeneralUserAppointmentService(authCtx)}
         >
           <RouterProvider router={router} />
         </GlobalContextUserGeneralAppointment.Provider>
