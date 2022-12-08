@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { dummyAPIServer } from "../endpoints/server";
+import { dummyAPIServer } from "../endpoints/server/dummy";
 import useAuthService, { CredentialStatus } from "./Auth";
 
 export type UuidString = string;

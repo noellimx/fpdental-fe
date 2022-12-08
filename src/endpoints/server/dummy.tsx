@@ -1,6 +1,6 @@
-import { HttpStatusCodes, Role } from "../contexts/Auth";
-import { Appointment, UuidString } from "../contexts/UserAppointments";
-import { dummyAPIBrowser, Token } from "./browser";
+import { HttpStatusCodes, Role } from "../../contexts/Auth";
+import { Appointment, UuidString } from "../../contexts/UserAppointments";
+import { dummyAPIBrowser, Token } from "../browser";
 interface InterfaceGetDummyAppointments {
   [key: string]: {
     get: () => Appointment[];

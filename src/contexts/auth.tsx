@@ -3,7 +3,7 @@ import { createContext } from "react";
 
 import { dummyAPIBrowser, Token } from "../endpoints/browser";
 
-import { dummyAPIServer } from "../endpoints/server";
+import { dummyAPIServer } from "../endpoints/server/dummy";
 
 export enum Role {
   ADMIN = "admin",

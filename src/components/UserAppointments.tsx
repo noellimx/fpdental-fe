@@ -5,7 +5,7 @@ import {
   GlobalContextUserAppointment,
 } from "../contexts/UserAppointments";
 
-import { dummyAPIServer } from "../endpoints/server";
+import { dummyAPIServer } from "../endpoints/server/dummy";
 import "./UserAppointments.css";
 
 enum DisplayMode {
