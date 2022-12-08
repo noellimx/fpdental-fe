@@ -3,13 +3,15 @@ import { createContext } from "react";
 
 import { dummyAPIBrowser, Token } from "../endpoints/browser";
 
+import { dummyAPIServer } from "../endpoints/server";
+
 export enum Role {
   ADMIN = "admin",
   GENERAL = "general",
   UNKNOWN = "unknown",
 }
 
-enum HttpStatusCodes {
+export enum HttpStatusCodes {
   OK = 200,
 }
 const initCredentialState = () => {
@@ -48,44 +50,6 @@ interface CredentialsAction {
   command: string;
   args: CredentialsState;
 }
-
-const dummyAPIServer = (() => {
-  const _validateTokenWithServer = (token: Token) => {
-    return true;
-  };
-  return {
-    isValidToken: async () => {
-      const token = dummyAPIBrowser.getSessionToken();
-      const is = _validateTokenWithServer(token);
-      return is ? { is, token } : { is, token: null };
-    },
-    login: async (
-      un: string,
-      pw: string
-    ): Promise<{ statusCode: number; token?: Token }> => {
-      return new Promise((resolve) =>
-        setTimeout(() => {
-          console.log(`[dummyAPI-login] ${un} `);
-          if (un === pw) {
-            let role = Role.UNKNOWN;
-            if (un === "dummyadmin") {
-              role = Role.ADMIN;
-            } else {
-              role = Role.GENERAL;
-            }
-
-            resolve({
-              statusCode: HttpStatusCodes.OK,
-              token: { id: `${un}12345`, username: un, role },
-            });
-          } else {
-            resolve({ statusCode: 403 });
-          }
-        }, 1000)
-      );
-    },
-  };
-})();
 
 enum CredentialsCommand {
   UPDATE_FIELD_USERNAME = "UPDATE_FIELD_USERNAME",

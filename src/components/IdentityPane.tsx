@@ -8,7 +8,6 @@ const shouldAllowEditUsername = (status: CredentialStatus) => {
   if (status === CredentialStatus.UNVERIFIED) {
     return true;
   }
-
   return false;
 };
 
@@ -16,7 +15,6 @@ const shouldAllowViewUsername = (status: CredentialStatus) => {
   if (status === CredentialStatus.UNKNOWN || status === CredentialStatus.NULL) {
     return false;
   }
-
   return true;
 };
 
