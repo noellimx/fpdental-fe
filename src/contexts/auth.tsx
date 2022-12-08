@@ -182,17 +182,17 @@ const useAuthService = () => {
 
         const response = await dummyAPIServer.isValidToken();
 
-        const { is, token } = response;
+        const { is, token: _token } = response;
 
-        if (token !== null) {
-          dummyAPIBrowser.setSessionToken(token);
+        if (_token) {
+          dummyAPIBrowser.setSessionToken(_token);
         } else {
           dummyAPIBrowser.clearSessionToken();
         }
         if (is) {
           console.log(`[AuthService] Authentication Status... good.`);
 
-          const { username, role } = token;
+          const { username, role } = _token;
 
           setUsername(username as string);
           if (role === Role.ADMIN) {

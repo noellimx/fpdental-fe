@@ -95,13 +95,17 @@ const LoginFormEditable = ({
   setStatusCode: Dispatch<SetStateAction<number>>;
   statusCode: number;
 }) => {
+  const { status } = useContext(GlobalContextAuth);
+
   return (
     <>
       {" "}
       <_inputUsername />
       <_inputPassword />
       <_buttonSubmit setStatusCode={setStatusCode} />
-      {statusCode > 0 && <div>{statusCode}</div>}
+      {status === CredentialStatus.UNVERIFIED && statusCode > 0 && (
+        <div>{statusCode}</div>
+      )}
     </>
   );
 };

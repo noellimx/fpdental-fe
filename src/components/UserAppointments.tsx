@@ -1,23 +1,71 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { GlobalContextAuth } from "../contexts/Auth";
 import {
-  Appointments,
+  Appointment,
   GlobalContextUserAppointment,
 } from "../contexts/UserAppointments";
 
+import { dummyAPIServer } from "../endpoints/server";
 import "./UserAppointments.css";
 
+enum DisplayMode {
+  DEFAULT = 1,
+  SUSPENSE = 2,
+  HIDDEN = 3,
+}
+const BookedAppointment = ({ appointment }: { appointment: Appointment }) => {
+  const [displayMode, setDisplayMode] = useState(DisplayMode.DEFAULT);
+  const { id } = appointment;
+
+  switch (displayMode) {
+    case DisplayMode.DEFAULT:
+      return (
+        <>
+          <div>
+            <div key={`${id}-appointments-id`}>id: {id}</div>
+            <button
+              key={`${id}-button-remove`}
+              onClick={async () => {
+                console.log(`[BookedAppointment] clicked`);
+                setDisplayMode(DisplayMode.SUSPENSE);
+                const ok = await dummyAPIServer.removeMyAppointment(id);
+
+                if (ok) {
+                  setDisplayMode(DisplayMode.HIDDEN);
+                } else {
+                  setDisplayMode(DisplayMode.DEFAULT);
+                }
+              }}
+            >
+              Release
+            </button>
+          </div>
+        </>
+      );
+    case DisplayMode.SUSPENSE:
+      return <>Deleting</>;
+    case DisplayMode.HIDDEN:
+
+    default:
+      return <></>;
+  }
+};
 const BookedAppointments = ({
   appointmentsBooked,
 }: {
-  appointmentsBooked: Appointments[];
+  appointmentsBooked: Appointment[];
 }) => {
   return (
     <>
       <div>------ Booked Appointments ------</div>
 
-      {appointmentsBooked.map(({ id }) => {
-        return <div key={id}>id: {id}</div>;
+      {appointmentsBooked.map((appointment) => {
+        return (
+          <BookedAppointment
+            key={`${appointment.id}-appointments-item`}
+            appointment={appointment}
+          />
+        );
       })}
     </>
   );
@@ -33,7 +81,7 @@ export default () => {
   const { status } = ctx;
 
   console.log(
-    `[UserAppointment Component] ${status} ${JSON.stringify(
+    `[UserAppointments Component] ${status} ${JSON.stringify(
       ctx
     )} msg ${message}`
   );
