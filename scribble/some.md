@@ -1,5 +1,5 @@
 const [credentials, dispatchCredentials] = useReducer(
-    (state: CredentialsState, action: CredentialsAction) => {
+(state: CredentialsState, action: CredentialsAction) => {
 
         switch action.command{
             case "ss" :
@@ -8,4 +8,5 @@ const [credentials, dispatchCredentials] = useReducer(
       return { ...state };
     },
     { mode: { password: { username: "", password: "" } } }
-  );
+
+);
