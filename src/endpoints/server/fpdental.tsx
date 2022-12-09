@@ -71,8 +71,22 @@ export const APIServerFpDental = (() => {
     token: Token
   ): Promise<boolean> => {
     // TODO
-    return new Promise((resolve) => {
-      resolve(false);
+
+    return new Promise(async (resolve) => {
+      try {
+        const response = await instance.post("/appointments/release", {
+          appointmentId: id,
+          token,
+        });
+
+        const { data } = response;
+
+        const { Is: is }: { Is: boolean } = data;
+
+        resolve(is);
+      } catch {
+        resolve(false);
+      }
     });
   };
   return {

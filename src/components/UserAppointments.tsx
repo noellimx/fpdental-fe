@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useContext, useState } from "react";
 import { GlobalContextAuth } from "../contexts/Auth";
 import {
@@ -28,12 +29,21 @@ const BookedAppointment = ({ appointment }: { appointment: Appointment }) => {
               onClick={async () => {
                 console.log(`[BookedAppointment] clicked`);
                 setDisplayMode(DisplayMode.SUSPENSE);
-                const ok = await APIServerAuth.removeMyAppointment(id);
+                try {
+                  const ok = await APIServerAuth.removeMyAppointment(id);
 
-                if (ok) {
-                  setDisplayMode(DisplayMode.HIDDEN);
-                } else {
+                  if (ok) {
+                    console.log(`Released Task ${id}`);
+                    setDisplayMode(DisplayMode.HIDDEN);
+                  } else {
+                    setDisplayMode(DisplayMode.DEFAULT);
+                  }
+                } catch (error) {
                   setDisplayMode(DisplayMode.DEFAULT);
+
+                  if (axios.isAxiosError(error)) {
+                    console.warn("Error releasing appointment");
+                  }
                 }
               }}
             >
