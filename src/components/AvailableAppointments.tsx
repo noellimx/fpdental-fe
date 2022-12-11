@@ -7,6 +7,7 @@ import AppointmentFC, {
   AppointmentButton,
   AppointmentsFC,
   DisplayMode,
+  AppointmentsTopBarFC,
 } from "./Appointments";
 import axios from "axios";
 
@@ -65,20 +66,22 @@ const AvailableAppointment = ({
 
 const AvailableAppointments = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+
+  const refresh = async () => {
+    const appointments = await APIServerAuth.availableAppointments();
+    setAppointments(appointments);
+    console.log(
+      `[useEffect] Available Appointments ${JSON.stringify(appointments)}`
+    );
+  };
   useEffect(() => {
     console.log("[useEffect] Available Appointments");
-    (async () => {
-      const appointments = await APIServerAuth.availableAppointments();
-      setAppointments(appointments);
-      console.log(
-        `[useEffect] Available Appointments ${JSON.stringify(appointments)}`
-      );
-    })();
+    refresh();
   }, []);
 
   return (
     <>
-      <div>Available Appointments</div>
+      <AppointmentsTopBarFC refresh={refresh} desc={"Available Appointments"} />
       <AppointmentsFC
         appointments={appointments}
         Component={AvailableAppointment}

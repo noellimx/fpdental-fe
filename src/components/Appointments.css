@@ -36,3 +36,23 @@ margin-left: auto;
   align-items: center;
   margin-left: 15px;
 }
+
+.appointments-top-bar-item-refresh-button {
+
+
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: max-content;
+}
+
+.appointments-top-bar-desc {
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}

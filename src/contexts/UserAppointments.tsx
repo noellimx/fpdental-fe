@@ -10,7 +10,8 @@ const useGeneralUserAppointmentService = (
   const [appointmentsBooked, setAppointmentsBooked] = useState<Appointment[]>(
     []
   );
-  useEffect(() => {
+
+  const refresh = async () => {
     console.log(
       `[useGeneralUserAppointmentService] auth context changed ${JSON.stringify(
         ctxAuth
@@ -25,10 +26,14 @@ const useGeneralUserAppointmentService = (
         setAppointmentsBooked(() => appointments);
       }
     })();
+  };
+  useEffect(() => {
+    refresh();
   }, [ctxAuth.status]);
   return {
     appointmentsBooked,
     message: ctxAuth.status,
+    refresh,
   };
 };
 export const GlobalContextUserAppointment = createContext(

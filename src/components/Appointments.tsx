@@ -1,7 +1,9 @@
 import React, { PropsWithChildren } from "react";
 import { UuidString } from "../utils/uuid";
 
-import "./UserAppointments.css";
+import { Button } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import "./Appointments.css";
 
 export enum DisplayMode {
   DEFAULT = 1,
@@ -85,6 +87,50 @@ export const _AppointmentIdParentFC = ({ thisid }: { thisid: string }) => {
   return (
     <div key={`${thisid}-appointments-id`} className="appointment-id">
       id: {thisid}
+    </div>
+  );
+};
+
+export const RefreshButton = ({
+  refresh,
+}: {
+  refresh: () => Promise<void>;
+}) => {
+  return (
+    <Button
+      onClick={refresh}
+      sx={{
+        textTransform: "none",
+        marginLeft: "auto",
+        width: "100px",
+        display: "flex",
+        fontSize: "16px",
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
+        borderTopLeftRadius: 0,
+        position: "relative",
+        backgroundColor: "orange",
+        color: "black",
+      }}
+      variant="contained"
+      endIcon={<RefreshIcon />}
+    >
+      Refresh
+    </Button>
+  );
+};
+
+export const AppointmentsTopBarFC = ({
+  refresh,
+  desc,
+}: {
+  refresh: () => Promise<void>;
+  desc: string;
+}) => {
+  return (
+    <div className="appointments-top-bar-item-refresh-button">
+      <div className="appointments-top-bar-desc">{desc}</div>
+      <RefreshButton refresh={refresh} />
     </div>
   );
 };

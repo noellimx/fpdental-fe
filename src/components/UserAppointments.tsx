@@ -11,8 +11,9 @@ import AppointmentFC, {
   AppointmentButton,
   AppointmentsFC,
   DisplayMode,
+  AppointmentsTopBarFC,
 } from "./Appointments";
-import "./UserAppointments.css";
+import "./Appointments.css";
 
 const BookedAppointmentFC = ({ appointment }: { appointment: Appointment }) => {
   const [displayMode, setDisplayMode] = useState(DisplayMode.DEFAULT);
@@ -70,6 +71,10 @@ const BookedAppointmentsFC = ({
   return (
     <>
       <div>------ Booked Appointments ------</div>
+      <div>
+        {" "}
+        Please refresh webpage for updates on your booked appointments.{" "}
+      </div>
       <AppointmentsFC
         Component={BookedAppointmentFC}
         appointments={appointmentsBooked}
@@ -79,22 +84,14 @@ const BookedAppointmentsFC = ({
 };
 
 export default () => {
-  const { message, appointmentsBooked } = useContext(
+  const { appointmentsBooked, refresh } = useContext(
     GlobalContextUserAppointment
   );
 
-  const ctx = useContext(GlobalContextAuth);
-
-  const { status } = ctx;
-
-  console.log(
-    `[UserAppointments Component] ${status} ${JSON.stringify(
-      ctx
-    )} msg ${message}`
-  );
   return (
-    <div className="userappointments">
+    <>
+      <AppointmentsTopBarFC refresh={refresh} desc={"User Appointments"} />
       <BookedAppointmentsFC appointmentsBooked={appointmentsBooked} />
-    </div>
+    </>
   );
 };
