@@ -3,6 +3,7 @@ import { GlobalContextAuth } from "../contexts/Auth";
 import "./IdentityPane.css";
 
 import { CredentialStatus } from "../contexts/Auth";
+import DevIdentityTable from "./DevIdentityTable";
 
 const shouldAllowEditUsername = (status: CredentialStatus) => {
   if (status === CredentialStatus.UNVERIFIED) {
@@ -76,6 +77,7 @@ const _buttonSubmit = ({
   return (
     <>
       <button
+        className="login-button-submit"
         onClick={async () => {
           const statusCode = await login();
 
@@ -100,9 +102,11 @@ const LoginFormEditable = ({
   return (
     <>
       {" "}
-      <_inputUsername />
-      <_inputPassword />
-      <_buttonSubmit setStatusCode={setStatusCode} />
+      <div className="login-form-inner">
+        <_inputUsername />
+        <_inputPassword />
+        <_buttonSubmit setStatusCode={setStatusCode} />
+      </div>
       {status === CredentialStatus.UNVERIFIED && statusCode > 0 && (
         <div>{statusCode}</div>
       )}
@@ -118,11 +122,12 @@ const LoginFormReadonly = () => {
   } = useContext(GlobalContextAuth);
 
   return (
-    <>
-      {" "}
+    <div className="login-form-read-only">
       <div> Logged In As : {username}</div>
-      <button onClick={logout}>Logout</button>
-    </>
+      <button className="login-button-logout" onClick={logout}>
+        Logout
+      </button>
+    </div>
   );
 };
 
@@ -140,7 +145,10 @@ export default () => {
   const [statusCode, setStatusCode] = useState(-1);
 
   let body = <div> {status} unimplemented </div>;
-
+  let containerClassName = "";
+  const containerClassNameSplit = "login-form-container";
+  const containerClassNameWide =
+    "login-form-container login-form-container-wide";
   switch (status) {
     case CredentialStatus.NULL:
       body = (
@@ -151,30 +159,38 @@ export default () => {
       break;
     case CredentialStatus.VERIFYING:
       body = <LoginFormVerifying />;
+      containerClassName = containerClassNameWide;
       break;
 
     case CredentialStatus.USER_ADMIN:
     case CredentialStatus.USER_GENERAL:
       body = <LoginFormReadonly />;
-
+      containerClassName = containerClassNameSplit;
       break;
     case CredentialStatus.UNKNOWN:
       body = <div>User has unknown role.</div>;
+      containerClassName = containerClassNameWide;
+
       break;
     case CredentialStatus.UNVERIFIED:
+      containerClassName = containerClassNameWide;
       body = (
-        <LoginFormEditable
-          statusCode={statusCode}
-          setStatusCode={setStatusCode}
-        />
+        <>
+          <LoginFormEditable
+            statusCode={statusCode}
+            setStatusCode={setStatusCode}
+          />
+          <DevIdentityTable />
+        </>
       );
       break;
   }
   return (
-    <div className="login-form-container">
+    <div className={containerClassName}>
       <div className="login-form-body">Login Form</div>
-
       {body}
+
+      <div></div>
     </div>
   );
 };

@@ -2,4 +2,8 @@
   display: flex;
 
   width: 100%;
+  height: fit-content;
+  align-items: stretch;
+  margin-left: 5%;
+  margin-right: 5%;
 }

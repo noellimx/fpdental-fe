@@ -1,66 +1,68 @@
 import axios from "axios";
 import { useContext, useState } from "react";
 import { GlobalContextAuth } from "../contexts/Auth";
-import {
-  Appointment,
-  GlobalContextUserAppointment,
-} from "../contexts/UserAppointments";
+import { GlobalContextUserAppointment } from "../contexts/UserAppointments";
 
 import { APIServerAuth } from "../drivers/server";
+import AppointmentFC, {
+  _AppointmentIdParentFC,
+  _SuspenseParentFC,
+  Appointment,
+  AppointmentButton,
+  AppointmentsFC,
+  DisplayMode,
+} from "./Appointments";
 import "./UserAppointments.css";
 
-enum DisplayMode {
-  DEFAULT = 1,
-  SUSPENSE = 2,
-  HIDDEN = 3,
-}
-const BookedAppointment = ({ appointment }: { appointment: Appointment }) => {
+const BookedAppointmentFC = ({ appointment }: { appointment: Appointment }) => {
   const [displayMode, setDisplayMode] = useState(DisplayMode.DEFAULT);
   const { id } = appointment;
 
-  switch (displayMode) {
-    case DisplayMode.DEFAULT:
-      return (
-        <>
-          <div>
-            <div key={`${id}-appointments-id`}>id: {id}</div>
-            <button
-              key={`${id}-button-remove`}
-              onClick={async () => {
-                console.log(`[BookedAppointment] clicked`);
-                setDisplayMode(DisplayMode.SUSPENSE);
-                try {
-                  const ok = await APIServerAuth.removeMyAppointment(id);
+  const defaultFC = (
+    <>
+      <_AppointmentIdParentFC thisid={id} />
+      <AppointmentButton
+        thiskey={`${id}-button-remove`}
+        onClickFn={async () => {
+          console.log(`[BookedAppointment] clicked`);
+          setDisplayMode(DisplayMode.SUSPENSE);
+          try {
+            const ok = await APIServerAuth.removeMyAppointment(id);
 
-                  if (ok) {
-                    console.log(`Released Task ${id}`);
-                    setDisplayMode(DisplayMode.HIDDEN);
-                  } else {
-                    setDisplayMode(DisplayMode.DEFAULT);
-                  }
-                } catch (error) {
-                  setDisplayMode(DisplayMode.DEFAULT);
+            if (ok) {
+              console.log(`Released Task ${id}`);
+              setDisplayMode(DisplayMode.HIDDEN);
+            } else {
+              setDisplayMode(DisplayMode.DEFAULT);
+            }
+          } catch (error) {
+            setDisplayMode(DisplayMode.DEFAULT);
 
-                  if (axios.isAxiosError(error)) {
-                    console.warn("Error releasing appointment");
-                  }
-                }
-              }}
-            >
-              Release
-            </button>
-          </div>
-        </>
-      );
-    case DisplayMode.SUSPENSE:
-      return <>Deleting</>;
-    case DisplayMode.HIDDEN:
+            if (axios.isAxiosError(error)) {
+              console.warn("Error releasing appointment");
+            }
+          }
+        }}
+        textVal={"Release"}
+      />
+    </>
+  );
 
-    default:
-      return <></>;
-  }
+  const suspenseFC = (
+    <_SuspenseParentFC>
+      <>Deleting</>
+    </_SuspenseParentFC>
+  );
+  return (
+    <AppointmentFC
+      displayMode={displayMode}
+      suspenseFC={suspenseFC}
+      defaultFC={defaultFC}
+    />
+  );
 };
-const BookedAppointments = ({
+
+const BookedAppointmentsFC = ({
   appointmentsBooked,
 }: {
   appointmentsBooked: Appointment[];
@@ -68,15 +70,10 @@ const BookedAppointments = ({
   return (
     <>
       <div>------ Booked Appointments ------</div>
-
-      {appointmentsBooked.map((appointment) => {
-        return (
-          <BookedAppointment
-            key={`${appointment.id}-appointments-item`}
-            appointment={appointment}
-          />
-        );
-      })}
+      <AppointmentsFC
+        Component={BookedAppointmentFC}
+        appointments={appointmentsBooked}
+      />
     </>
   );
 };
@@ -97,12 +94,7 @@ export default () => {
   );
   return (
     <div className="userappointments">
-      <div>
-        <div>User's Appointment</div>
-        <div>{message}</div>
-
-        <BookedAppointments appointmentsBooked={appointmentsBooked} />
-      </div>
+      <BookedAppointmentsFC appointmentsBooked={appointmentsBooked} />
     </div>
   );
 };

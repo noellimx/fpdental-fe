@@ -6,8 +6,10 @@ import { GlobalContextAuth } from "./contexts/Auth";
 import useGeneralUserAppointmentService, {
   GlobalContextUserAppointment as GlobalContextUserGeneralAppointment,
 } from "./contexts/UserAppointments";
-import GeneralUserAppointments from "./components/UserAppointments";
+
+import GeneralUser from "./components/GeneralUser";
 import Template from "./components/Template";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -16,7 +18,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/general-user",
-        element: <GeneralUserAppointments />,
+        element: <GeneralUser />,
       },
     ],
   },

@@ -1,13 +1,8 @@
 import { createContext, useEffect, useState } from "react";
+import { Appointment } from "../components/Appointments";
 
 import { APIServerFpDental } from "../endpoints/server/fpdental";
 import useAuthService, { CredentialStatus } from "./Auth";
-
-export type UuidString = string;
-export type Appointment = {
-  description: string;
-  id: UuidString;
-};
 
 const useGeneralUserAppointmentService = (
   ctxAuth: ReturnType<typeof useAuthService>

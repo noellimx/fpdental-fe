@@ -1,7 +1,9 @@
 import { HttpStatusCodes, Role } from "../../contexts/Auth";
-import { Appointment, UuidString } from "../../contexts/UserAppointments";
+import { Appointment } from "../../components/Appointments";
+
 import { Token } from "../browser";
 import { APIBrowser } from "../../drivers/browser";
+import { UuidString } from "../../utils/uuid";
 interface InterfaceGetDummyAppointments {
   [key: string]: {
     get: () => Appointment[];
@@ -76,7 +78,7 @@ export const APIServerMock = (() => {
     });
   };
   return {
-    isValidToken: async () => {
+    isValidToken: async (): Promise<{ is: boolean; token: null | Token }> => {
       const token = APIBrowser.getSessionToken();
       const is = await _validateTokenWithServer(token);
       return is ? { is, token } : { is, token: null };
@@ -95,7 +97,23 @@ export const APIServerMock = (() => {
         }, 300);
       });
     },
+    availableAppointments: async (): Promise<Appointment[]> => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const some: Appointment[] = [
+            {
+              description: "mock avail appt",
+              id: "c430d6f5-f206-47d6-bb13-b5603772b4a0",
+            },
+          ];
+          resolve(some);
+        }, 1000);
+      });
+    },
 
+    bookAppointment: async (id: string): Promise<boolean> => {
+      return false;
+    },
     login: async (
       un: string,
       pw: string

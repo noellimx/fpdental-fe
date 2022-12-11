@@ -1,4 +1,3 @@
-import { Appointment, UuidString } from "../../contexts/UserAppointments";
 import {
   APIBrowser,
   Token,
@@ -6,6 +5,8 @@ import {
   transformTokenBeToToken,
 } from "../browser";
 import axios, { AxiosError } from "axios";
+import { UuidString } from "../../utils/uuid";
+import { Appointment } from "../../components/Appointments";
 
 type AppointmentBE = {
   Description: string;
@@ -32,7 +33,7 @@ export const APIServerFpDental = (() => {
     timeout: 2000,
   });
 
-  const _validateTokenWithServer = async (token: Token) => {
+  const _validateTokenWithServer = async (token: Token): Promise<boolean> => {
     console.log(
       `[APIServerFpDental::_validateTokenWithServer]${JSON.stringify(token)}`
     );
@@ -43,7 +44,7 @@ export const APIServerFpDental = (() => {
           const response = await instance.post("/auth/is-valid-token", {
             token,
           });
-          const { Is: is } = response.data;
+          const { Is: is }: { Is: boolean } = response.data;
           console.log(`[APIServerFpDental::_validateTokenWithServer] ?${is}`);
 
           resolve(is);
@@ -90,9 +91,9 @@ export const APIServerFpDental = (() => {
     });
   };
   return {
-    isValidToken: async () => {
+    isValidToken: async (): Promise<{ is: boolean; token: null | Token }> => {
       const token = APIBrowser.getSessionToken();
-      const is = await _validateTokenWithServer(token);
+      const is: boolean = await _validateTokenWithServer(token);
       return is ? { is, token } : { is, token: null };
     },
     getMyAppointments: async (): Promise<Appointment[]> => {
@@ -110,6 +111,42 @@ export const APIServerFpDental = (() => {
       });
     },
 
+    availableAppointments: async (): Promise<Appointment[]> => {
+      try {
+        console.log(`[API_FPDENTAL::availableAppointments]`);
+
+        const response = await instance.get("/appointments/avail");
+
+        const { Appointments }: { Appointments: AppointmentBE[] } =
+          response.data;
+
+        console.log(JSON.stringify(Appointments));
+        return transformAppointmentBEToAppointmentMany(Appointments);
+      } catch {
+        return [];
+      }
+    },
+    bookAppointment: async (id: string) => {
+      const token = APIBrowser.getSessionToken();
+
+      return new Promise((resolve) => {
+        setTimeout(async () => {
+          try {
+            const response = await instance.post("/appointments/book", {
+              appointmentId: id,
+              token,
+            });
+            const { Is: is } = response.data;
+            console.log("[API_FPDENTAL::bookAppointment] ok");
+            resolve(is);
+          } catch {
+            console.log("[API_FPDENTAL::bookAppointment] not ok");
+
+            resolve(false);
+          }
+        }, 300);
+      });
+    },
     login: async (
       un: string,
       pw: string
