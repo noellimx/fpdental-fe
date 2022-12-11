@@ -10,7 +10,7 @@
 .login-form-container-wide {
   width: 100%;
 }
-.login-form-inner{
+.login-form-inner {
   display: flex;
   flex-direction: column;
 
@@ -34,32 +34,29 @@
   margin-left: 10px;
   margin-right: 10px;
 
-  min-width: 100px ;
+  min-width: 100px;
 
   max-width: 60%;
 }
 
-.login-button-submit{
+.login-button-submit {
   display: flex;
   margin-top: 10px;
 }
 
-
-.login-form-read-only{
+.login-form-read-only {
   display: flex;
   height: 100%;
   flex-direction: column;
 }
 
 .login-button-logout {
-
   display: flex;
   margin-top: auto;
   margin-left: auto;
 
-  width: fit-content; 
-    border-bottom-left-radius: 0;
+  width: fit-content;
+  border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
-
 }
