@@ -4,6 +4,8 @@ import { APIServer } from "../endpoints/server/typings";
 
 const modeServerAuth = import.meta.env.VITE_ENV_AUTH_SERVER_API;
 
+console.log(`modeServerAuth ${modeServerAuth}`);
+
 const MODE_SERVER_AUTH_FPDENTAL = "fpdental";
 const MODE_SERVER_AUTH_MOCK = "mock";
 

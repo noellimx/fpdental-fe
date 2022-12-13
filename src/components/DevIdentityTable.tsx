@@ -24,8 +24,8 @@ export default () => {
         <TableHead>
           <TableRow>
             <TableCell align="left">Role</TableCell>
-            <TableCell align="left">Username&nbsp;(g)</TableCell>
-            <TableCell align="left">Password&nbsp;(g)</TableCell>
+            <TableCell align="left">Username</TableCell>
+            <TableCell align="left">Password</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
