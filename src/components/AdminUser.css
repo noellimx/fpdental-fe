@@ -1,17 +1,13 @@
-
 .admin-user {
+  display: flex;
 
-    display:flex;
+  border: 1px solid black;
+  flex-direction: column;
 
-    border: 1px solid black;
-    flex-direction: column;
-
-    width: 100%;
+  width: 100%;
 }
 
-
-.admin-top-bar{
-    display: flex;
-    border: 1px solid black;
-
+.admin-top-bar {
+  display: flex;
+  border: 1px solid black;
 }
