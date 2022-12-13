@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { CredentialStatus, GlobalContextAuth } from "../contexts/Auth";
 import IdentityPane from "./IdentityPane";
 
@@ -12,6 +12,9 @@ export default () => {
   useEffect(() => {
     if (status === CredentialStatus.USER_GENERAL) {
       navigate("/general-user");
+    } else if (status === CredentialStatus.USER_ADMIN) {
+      console.log(`navigate:admin-user`);
+      navigate("/admin-user");
     } else {
       navigate("/");
     }

@@ -110,6 +110,7 @@ export const APIServerMock = (() => {
         }, 1000);
       });
     },
+    getUserSessions: async () => {},
 
     bookAppointment: async (id: string): Promise<boolean> => {
       return false;

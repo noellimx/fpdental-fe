@@ -1,14 +1,18 @@
 import GeneralUserAppointments from "./UserAppointments";
 
 import "./GeneralUser.css";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import AvailableAppointments from "./AvailableAppointments";
-
+import useGeneralUserAppointmentService, {
+  GlobalContextGeneralUserAppointment,
+} from "../contexts/UserAppointments";
+import { GlobalContextAuth } from "../contexts/Auth";
 enum VIEWS_GENERAL_USER {
   ME = "ME",
   AVAILABLE = "AVAIL",
 }
-const GeneralUser = () => {
+const GeneralUser = ({}: {}) => {
+  const authCtx = useContext(GlobalContextAuth);
   const [view, setView] = useState<VIEWS_GENERAL_USER>(VIEWS_GENERAL_USER.ME);
 
   const [body, buttonText] = ((view) => {
@@ -31,27 +35,31 @@ const GeneralUser = () => {
   })(view);
 
   return (
-    <div className="general-user">
-      {body}
+    <GlobalContextGeneralUserAppointment.Provider
+      value={useGeneralUserAppointmentService(authCtx)}
+    >
+      <div className="general-user">
+        {body}
 
-      <div className="toggle-user-view-button-parent">
-        <button
-          className="toggle-user-view-button"
-          onClick={() => {
-            setView((v) => {
-              switch (v) {
-                case VIEWS_GENERAL_USER.AVAILABLE:
-                  return VIEWS_GENERAL_USER.ME;
-                case VIEWS_GENERAL_USER.ME:
-                  return VIEWS_GENERAL_USER.AVAILABLE;
-              }
-            });
-          }}
-        >
-          {buttonText}
-        </button>
+        <div className="toggle-user-view-button-parent">
+          <button
+            className="toggle-user-view-button"
+            onClick={() => {
+              setView((v) => {
+                switch (v) {
+                  case VIEWS_GENERAL_USER.AVAILABLE:
+                    return VIEWS_GENERAL_USER.ME;
+                  case VIEWS_GENERAL_USER.ME:
+                    return VIEWS_GENERAL_USER.AVAILABLE;
+                }
+              });
+            }}
+          >
+            {buttonText}
+          </button>
+        </div>
       </div>
-    </div>
+    </GlobalContextGeneralUserAppointment.Provider>
   );
 };
 

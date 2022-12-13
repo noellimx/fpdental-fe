@@ -3,11 +3,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import useAuthService from "./contexts/Auth";
 import { GlobalContextAuth } from "./contexts/Auth";
-import useGeneralUserAppointmentService, {
-  GlobalContextUserAppointment as GlobalContextUserGeneralAppointment,
-} from "./contexts/UserAppointments";
 
 import GeneralUser from "./components/GeneralUser";
+import AdminUser from "./components/AdminUser";
 import Template from "./components/Template";
 
 const router = createBrowserRouter([
@@ -20,6 +18,11 @@ const router = createBrowserRouter([
         path: "/general-user",
         element: <GeneralUser />,
       },
+
+      {
+        path: "/admin-user",
+        element: <AdminUser />,
+      },
     ],
   },
   {
@@ -30,14 +33,11 @@ const router = createBrowserRouter([
 
 function App() {
   const authCtx = useAuthService();
+
   return (
     <div className="app">
       <GlobalContextAuth.Provider value={authCtx}>
-        <GlobalContextUserGeneralAppointment.Provider
-          value={useGeneralUserAppointmentService(authCtx)}
-        >
-          <RouterProvider router={router} />
-        </GlobalContextUserGeneralAppointment.Provider>
+        <RouterProvider router={router} />
       </GlobalContextAuth.Provider>
     </div>
   );

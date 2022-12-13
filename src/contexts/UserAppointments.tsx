@@ -36,7 +36,7 @@ const useGeneralUserAppointmentService = (
     refresh,
   };
 };
-export const GlobalContextUserAppointment = createContext(
+export const GlobalContextGeneralUserAppointment = createContext(
   {} as ReturnType<typeof useGeneralUserAppointmentService>
 );
 export default useGeneralUserAppointmentService;

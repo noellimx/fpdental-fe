@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useContext, useState } from "react";
 import { GlobalContextAuth } from "../contexts/Auth";
-import { GlobalContextUserAppointment } from "../contexts/UserAppointments";
+import { GlobalContextGeneralUserAppointment } from "../contexts/UserAppointments";
 
 import { APIServerAuth } from "../drivers/server";
 import AppointmentFC, {
@@ -84,14 +84,19 @@ const BookedAppointmentsFC = ({
 };
 
 export default () => {
-  const { appointmentsBooked, refresh } = useContext(
-    GlobalContextUserAppointment
-  );
-
   return (
     <>
-      <AppointmentsTopBarFC refresh={refresh} desc={"User Appointments"} />
-      <BookedAppointmentsFC appointmentsBooked={appointmentsBooked} />
+      <GlobalContextGeneralUserAppointment.Consumer>
+        {({ appointmentsBooked, refresh }) => (
+          <div>
+            <AppointmentsTopBarFC
+              refresh={refresh}
+              desc={"User Appointments"}
+            />
+            <BookedAppointmentsFC appointmentsBooked={appointmentsBooked} />
+          </div>
+        )}
+      </GlobalContextGeneralUserAppointment.Consumer>
     </>
   );
 };

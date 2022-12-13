@@ -13,6 +13,32 @@ type AppointmentBE = {
   Id: UuidString;
 };
 
+type UserSessionBE = {
+  Username: string;
+  TokenIds: string[];
+};
+type UserSessionsBE = UserSessionBE[];
+
+export type UserSession = {
+  username: string;
+  tokenIds: string[];
+};
+export type UserSessions = UserSession[];
+
+const transformUserSessionsBEToUserSession = (
+  usBE: UserSessionBE
+): UserSession => {
+  const { Username, TokenIds } = usBE;
+
+  return {
+    username: Username,
+    tokenIds: TokenIds,
+  };
+};
+
+const transformUserSessionsBEToUserSessions = (usBEs: UserSessionsBE) =>
+  usBEs.map(transformUserSessionsBEToUserSession);
+
 const transformAppointmentBEToAppointment = (
   apptB: AppointmentBE
 ): Appointment => {
@@ -22,9 +48,8 @@ const transformAppointmentBEToAppointment = (
     id: Id,
   };
 };
-const transformAppointmentBEToAppointmentMany = (apptBs: AppointmentBE[]) => {
-  return apptBs.map(transformAppointmentBEToAppointment);
-};
+const transformAppointmentBEToAppointmentMany = (apptBs: AppointmentBE[]) =>
+  apptBs.map(transformAppointmentBEToAppointment);
 
 export const APIServerFpDental = (() => {
   const PORT = ":8000";
@@ -126,7 +151,7 @@ export const APIServerFpDental = (() => {
         return [];
       }
     },
-    bookAppointment: async (id: string) => {
+    bookAppointment: async (id: string): Promise<boolean> => {
       const token = APIBrowser.getSessionToken();
 
       return new Promise((resolve) => {
@@ -146,6 +171,26 @@ export const APIServerFpDental = (() => {
           }
         }, 300);
       });
+    },
+
+    getUserSessions: async (): Promise<UserSessions> => {
+      console.log("[API_FPDENTAL::getUserSessions]");
+      const token = APIBrowser.getSessionToken();
+
+      try {
+        const response = await instance.post("/admin/sessions", {
+          token,
+        });
+
+        const { data } = response;
+
+        const { UserSessions } = data;
+
+        return transformUserSessionsBEToUserSessions(UserSessions);
+      } catch {
+        console.log("[API_FPDENTAL::bookAppointment] not ok");
+        return [];
+      }
     },
     login: async (
       un: string,
