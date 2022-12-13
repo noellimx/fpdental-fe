@@ -185,7 +185,7 @@ const AdminUser = () => {
     return paneMode === AdminPaneMode.SESSIONS_MANAGEMENT ? (
       <UserSessionsFC />
     ) : paneMode === AdminPaneMode.USERS_MANAGEMENT ? (
-      <div>users</div>
+      <div>{`Users [Pane Yet To Implement]`}</div>
     ) : (
       <div>...</div>
     );
