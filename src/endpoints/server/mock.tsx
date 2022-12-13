@@ -4,6 +4,7 @@ import { Appointment } from "../../components/Appointments";
 import { Token } from "../browser";
 import { APIBrowser } from "../../drivers/browser";
 import { UuidString } from "../../utils/uuid";
+import { UserSessions } from "./fpdental";
 interface InterfaceGetDummyAppointments {
   [key: string]: {
     get: () => Appointment[];
@@ -115,6 +116,8 @@ export const APIServerMock = (() => {
     bookAppointment: async (id: string): Promise<boolean> => {
       return false;
     },
+
+    revokeUserSessions: async (usS: UserSessions): Promise<void> => {},
     login: async (
       un: string,
       pw: string

@@ -7,6 +7,7 @@ import {
 import axios, { AxiosError } from "axios";
 import { UuidString } from "../../utils/uuid";
 import { Appointment } from "../../components/Appointments";
+import { ManagedUserSessions } from "../../components/AdminUser";
 
 type AppointmentBE = {
   Description: string;
@@ -185,12 +186,24 @@ export const APIServerFpDental = (() => {
         const { data } = response;
 
         const { UserSessions } = data;
+        console.log(
+          `[API_FPDENTAL::getUserSessions] length(Users): ${UserSessions.length}`
+        );
 
         return transformUserSessionsBEToUserSessions(UserSessions);
       } catch {
         console.log("[API_FPDENTAL::bookAppointment] not ok");
         return [];
       }
+    },
+
+    revokeUserSessions: async (usS: UserSessions): Promise<void> => {
+      const token = APIBrowser.getSessionToken();
+
+      await instance.post("/admin/revoke-sessions", {
+        userSessions: usS,
+        token,
+      });
     },
     login: async (
       un: string,

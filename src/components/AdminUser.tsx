@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button, Checkbox } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import useAdministratorService, {
   GlobalContextAdministrator,
@@ -31,6 +31,7 @@ const AdminTopBarButton = ({
     </Button>
   );
 };
+
 const AdminTopBar = ({
   toggleModeSession,
   toggleModeUser,
@@ -54,7 +55,7 @@ interface ManagedToken {
   id: string;
   toRevoke: boolean;
 }
-type ManagedUserSessions = ManagedUserSession[];
+export type ManagedUserSessions = ManagedUserSession[];
 
 const txUserSessionsToManaged = (mu: UserSessions): ManagedUserSession[] =>
   mu.map(({ tokenIds, username }) => ({
@@ -63,8 +64,12 @@ const txUserSessionsToManaged = (mu: UserSessions): ManagedUserSession[] =>
   }));
 const ManagedUserSessionsFC = ({
   userSessions,
+  revokeUserSessions,
+  refresh,
 }: {
   userSessions: UserSessions;
+  revokeUserSessions: (_: ManagedUserSessions) => Promise<void>;
+  refresh: () => Promise<void>;
 }) => {
   const [managedUserSessions, setManagedUserSessions] =
     useState<ManagedUserSessions>([]);
@@ -73,36 +78,94 @@ const ManagedUserSessionsFC = ({
     setManagedUserSessions(txUserSessionsToManaged(userSessions));
   }, [userSessions]);
 
-  return (
-    <div>
-      <div>user sessions {`${managedUserSessions.length}`}</div>
+  const toggleUserSessionToRevoke = (_username: string, _tokenId: string) => {
+    setManagedUserSessions((muS) => {
+      return muS.map((mu) => {
+        if (mu.username === _username) {
+          return {
+            username: mu.username,
+            tokenIds: mu.tokenIds.map((tId) => {
+              if (tId.id === _tokenId) {
+                return { id: tId.id, toRevoke: !tId.toRevoke };
+              }
+              return { ...tId };
+            }),
+          };
+        }
 
-      {managedUserSessions.map((mus, id) => {
-        return (
-          <div key={`${id}-${mus.username}`}>
-            <div key={`${id}-${mus.username}`}>{mus.username}</div>
-            {mus.tokenIds.map(({ id }) => (
-              <div key={`${id}`}>{id}</div>
-            ))}
-          </div>
-        );
-      })}
+        return mu;
+      });
+    });
+  };
+
+  const revoke = async () => {
+    await revokeUserSessions(managedUserSessions).then(refresh).catch(refresh);
+  };
+
+  const [revoking, setRevoking] = useState(false);
+  return revoking ? (
+    <div>Revoking... </div>
+  ) : (
+    <div>
+      <div>
+        <div>user sessions {`${managedUserSessions.length}`}</div>
+
+        {managedUserSessions.map((mus, id) => {
+          return (
+            <div key={`${id}-${mus.username}`}>
+              <div
+                className="user-session-username"
+                key={`${id}-${mus.username}`}
+              >
+                {mus.username}
+              </div>
+              {mus.tokenIds.map(({ id: tokenId, toRevoke }) => (
+                <div className="user-session-token-id-outer" key={`${tokenId}`}>
+                  <div className="user-session-token-id-desc">{tokenId}</div>
+                  <Checkbox
+                    onClick={() => {
+                      toggleUserSessionToRevoke(mus.username, tokenId);
+                    }}
+                    checked={toRevoke}
+                  />
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+
+      <button
+        onClick={() => {
+          setRevoking(() => true);
+          setTimeout(() => {
+            revoke().then(() => setRevoking(() => false));
+          }, 1000);
+        }}
+      >
+        Revoke Sessions
+      </button>
     </div>
   );
 };
 const UserSessionsFC = () => {
   return (
     <GlobalContextAdministrator.Consumer>
-      {({ userSessions }: { userSessions: UserSessions }) => {
-        console.log(
-          `[UserSessionsFC::globalContextAdministrator.Consumer]${userSessions.length}`
-        );
-        return (
-          <ManagedUserSessionsFC
-            userSessions={userSessions}
-          ></ManagedUserSessionsFC>
-        );
-      }}
+      {({
+        userSessions,
+        revokeUserSessions,
+        refresh,
+      }: {
+        userSessions: UserSessions;
+        revokeUserSessions: (_: ManagedUserSessions) => Promise<void>;
+        refresh: () => Promise<void>;
+      }) => (
+        <ManagedUserSessionsFC
+          userSessions={userSessions}
+          refresh={refresh}
+          revokeUserSessions={revokeUserSessions}
+        />
+      )}
     </GlobalContextAdministrator.Consumer>
   );
 };
